@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NEXUS Icon Generator</title>
+<style>
+  body { font-family: sans-serif; background: #111; color: #eee; padding: 2rem; text-align: center; }
+  canvas { display: none; }
+  .icon-preview { display: inline-block; margin: 1rem; text-align: center; }
+  img { border-radius: 22%; display: block; margin: 0 auto 0.5rem; }
+  button { background: #7b61ff; border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; margin: 4px; display: block; width: 180px; }
+  button:hover { opacity: 0.85; }
+  h2 { color: #00e5c8; margin-top: 2rem; }
+  .note { background: #1a1a2e; border: 1px solid #333; border-radius: 12px; padding: 1rem 1.5rem; margin: 1.5rem auto; max-width: 500px; font-size: 13px; line-height: 1.6; color: #aaa; text-align: left; }
+  .note strong { color: #eee; }
+</style>
+</head>
+<body>
+<h1>🎨 NEXUS Icon Generator</h1>
+<p style="color:#aaa">Click each button to download the icon. Save all 4 into an <strong>icons/</strong> folder.</p>
+
+<canvas id="c"></canvas>
+
+<h2>🌍 GeoMaster Icons</h2>
+<div id="geo-previews"></div>
+
+<h2>🧠 MindVault Icons</h2>
+<div id="mv-previews"></div>
+
+<div class="note">
+  <strong>How to use these icons:</strong><br>
+  1. Create a folder called <code>icons</code> in your project<br>
+  2. Save all 4 downloaded PNGs into it<br>
+  3. Your folder structure should look like:<br><br>
+  <code>
+  📁 your-repo/<br>
+  &nbsp;&nbsp;📄 nexus-geomaster.html<br>
+  &nbsp;&nbsp;📄 nexus-mindvault.html<br>
+  &nbsp;&nbsp;📄 geomaster-manifest.json<br>
+  &nbsp;&nbsp;📄 mindvault-manifest.json<br>
+  &nbsp;&nbsp;📄 geomaster-sw.js<br>
+  &nbsp;&nbsp;📄 mindvault-sw.js<br>
+  &nbsp;&nbsp;📁 icons/<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;📄 geomaster-192.png<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;📄 geomaster-512.png<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;📄 mindvault-192.png<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;📄 mindvault-512.png<br>
+  </code>
+</div>
+
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+function drawGeoMaster(size) {
+  c.width = size; c.height = size;
+  ctx.clearRect(0, 0, size, size);
+  const r = size * 0.14;
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, size, size);
+  bg.addColorStop(0, '#0c0c14');
+  bg.addColorStop(1, '#1a1a2e');
+  ctx.fillStyle = bg;
+  roundRect(size, r);
+  ctx.fill();
+
+  // Outer ring
+  const cx = size / 2, cy = size / 2, or = size * 0.36;
+  ctx.strokeStyle = 'rgba(123,97,255,0.4)';
+  ctx.lineWidth = size * 0.025;
+  ctx.beginPath();
+  ctx.arc(cx, cy, or, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Globe grid lines
+  ctx.strokeStyle = 'rgba(123,97,255,0.25)';
+  ctx.lineWidth = size * 0.015;
+  // Equator
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, or, or * 0.25, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  // Vertical line
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - or);
+  ctx.lineTo(cx, cy + or);
+  ctx.stroke();
+  // Meridian curves
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, or * 0.55, or, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Gradient fill over globe
+  const grd = ctx.createRadialGradient(cx - or*0.2, cy - or*0.2, 0, cx, cy, or);
+  grd.addColorStop(0, 'rgba(123,97,255,0.35)');
+  grd.addColorStop(1, 'rgba(0,229,200,0.15)');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.arc(cx, cy, or, 0, Math.PI * 2);
+  ctx.fill();
+
+  // NEXUS label
+  ctx.fillStyle = '#c4b5fd';
+  ctx.font = `bold ${size * 0.09}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('NEXUS', cx, cy - size * 0.04);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${size * 0.11}px sans-serif`;
+  ctx.fillText('GeoMaster', cx, cy + size * 0.1);
+
+  // Accent dot
+  ctx.fillStyle = '#00e5c8';
+  ctx.beginPath();
+  ctx.arc(cx, cy + size * 0.3, size * 0.04, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawMindVault(size) {
+  c.width = size; c.height = size;
+  ctx.clearRect(0, 0, size, size);
+  const r = size * 0.14;
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, size, size);
+  bg.addColorStop(0, '#08090f');
+  bg.addColorStop(1, '#1d1e2e');
+  ctx.fillStyle = bg;
+  roundRect(size, r);
+  ctx.fill();
+
+  // Brain-like circles
+  const cx = size / 2, cy = size * 0.44;
+  const br = size * 0.28;
+
+  const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, br);
+  grd.addColorStop(0, 'rgba(255,60,95,0.5)');
+  grd.addColorStop(0.6, 'rgba(167,139,250,0.3)');
+  grd.addColorStop(1, 'rgba(167,139,250,0.05)');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.arc(cx, cy, br, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Outer ring
+  ctx.strokeStyle = 'rgba(255,60,95,0.5)';
+  ctx.lineWidth = size * 0.022;
+  ctx.beginPath();
+  ctx.arc(cx, cy, br, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Inner circuit lines
+  ctx.strokeStyle = 'rgba(167,139,250,0.4)';
+  ctx.lineWidth = size * 0.013;
+  ctx.beginPath();
+  ctx.moveTo(cx - br * 0.5, cy);
+  ctx.lineTo(cx + br * 0.5, cy);
+  ctx.moveTo(cx, cy - br * 0.5);
+  ctx.lineTo(cx, cy + br * 0.5);
+  ctx.moveTo(cx - br * 0.35, cy - br * 0.35);
+  ctx.lineTo(cx + br * 0.35, cy + br * 0.35);
+  ctx.moveTo(cx + br * 0.35, cy - br * 0.35);
+  ctx.lineTo(cx - br * 0.35, cy + br * 0.35);
+  ctx.stroke();
+
+  // Brain emoji large
+  ctx.font = `${size * 0.28}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('🧠', cx, cy + size * 0.11);
+
+  // NEXUS label
+  ctx.fillStyle = '#ff3c5f';
+  ctx.font = `bold ${size * 0.09}px sans-serif`;
+  ctx.fillText('NEXUS', cx, size * 0.82);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${size * 0.1}px sans-serif`;
+  ctx.fillText('MindVault', cx, size * 0.92);
+}
+
+function roundRect(size, r) {
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(size - r, 0);
+  ctx.quadraticCurveTo(size, 0, size, r);
+  ctx.lineTo(size, size - r);
+  ctx.quadraticCurveTo(size, size, size - r, size);
+  ctx.lineTo(r, size);
+  ctx.quadraticCurveTo(0, size, 0, size - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+}
+
+function makeIconBtn(label, filename, drawFn, size, previewSize, container) {
+  drawFn(size);
+  const dataUrl = c.toDataURL('image/png');
+
+  const wrap = document.createElement('div');
+  wrap.className = 'icon-preview';
+
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.width = previewSize;
+  img.height = previewSize;
+  wrap.appendChild(img);
+
+  const btn = document.createElement('button');
+  btn.textContent = `⬇ ${label}`;
+  btn.onclick = () => {
+    drawFn(size);
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = filename;
+    a.click();
+  };
+  wrap.appendChild(btn);
+
+  document.getElementById(container).appendChild(wrap);
+}
+
+makeIconBtn('geomaster-192.png', 'geomaster-192.png', drawGeoMaster, 192, 96, 'geo-previews');
+makeIconBtn('geomaster-512.png', 'geomaster-512.png', drawGeoMaster, 512, 128, 'geo-previews');
+makeIconBtn('mindvault-192.png', 'mindvault-192.png', drawMindVault, 192, 96, 'mv-previews');
+makeIconBtn('mindvault-512.png', 'mindvault-512.png', drawMindVault, 512, 128, 'mv-previews');
+</script>
+</body>
+</html>
